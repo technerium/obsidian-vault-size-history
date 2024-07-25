@@ -1,0 +1,1 @@
+# obsidian-vault-size-history
