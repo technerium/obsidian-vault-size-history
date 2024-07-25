@@ -52,7 +52,7 @@ export class MainSettingTab extends PluginSettingTab {
 			cls: 'technerium-vshp-settings-credits-p',
 		});
 		credits.appendText(
-			'This plugin is built using ',
+			'This plugin has been built using ',
 		);
 
 
