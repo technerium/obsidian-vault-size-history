@@ -110,7 +110,7 @@ export class GraphModal extends Modal {
 		}
 
 
-		var option: EChartsOption;
+		let option: EChartsOption;
 
 		option = {
 			title: {
