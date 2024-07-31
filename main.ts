@@ -11,14 +11,14 @@ export default class VaultSizeHistoryPlugin extends Plugin {
 		this.addSettingTab(new MainSettingTab(this.app, this));
 
 		this.addCommand({
-			id: "technerium-vshp-open-graph-modal",
-			name: "Open Graph Modal",
+			id: "open-graph-modal",
+			name: "Open graph",
 			callback: () => {
 				this.activateView()
 			},
 		});
 
-		this.addRibbonIcon("area-chart", "Vault Size History Modal", () => {
+		this.addRibbonIcon("area-chart", "Vault size history", () => {
 			this.activateView();
 		});
 	}

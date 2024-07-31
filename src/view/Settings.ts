@@ -28,10 +28,8 @@ export class MainSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', {text: 'Vault Size History'});
-
 		new Setting(containerEl)
-			.setName('Date Format')
+			.setName('Date format')
 			.setDesc("Define how dates are displayed on the graph. Use 'yyyy','yy' for year, 'mm','m' for month, and 'dd','d' for day.")
 			.addText(text => text
 				.setPlaceholder('mm/dd/yyyy or m/d/yy')

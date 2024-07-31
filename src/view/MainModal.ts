@@ -19,15 +19,15 @@ interface EChartCallbackParams {
 }
 
 interface EChartCallbackSelected {
-	'Markdown Files': boolean,
-	'Other Files': boolean,
-	'All Files': boolean
+	'Markdown files': boolean,
+	'Other files': boolean,
+	'All files': boolean
 }
 
 enum ChartLines {
-	MarkdownFiles = 'Markdown Files',
-	OtherFiles = 'Other Files',
-	AllFiles = 'All Files',
+	MarkdownFiles = 'Markdown files',
+	OtherFiles = 'Other files',
+	AllFiles = 'All files',
 }
 
 
@@ -114,13 +114,13 @@ export class GraphModal extends Modal {
 
 		option = {
 			title: {
-				text: 'Vault Size'
+				text: 'Vault size history'
 			},
 			tooltip: {
 				trigger: 'axis'
 			},
 			legend: {
-				data: ['Markdown Files', 'Other Files', 'All Files']
+				data: ['Markdown files', 'Other files', 'All files']
 			},
 			grid: {
 				left: '6%',
