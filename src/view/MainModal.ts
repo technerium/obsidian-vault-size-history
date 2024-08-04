@@ -66,6 +66,9 @@ export class GraphModal extends Modal {
 		let graphContainer = document.createElement('div');
 		graphContainer.classList.add('technerium-vshp-graph-container');
 		contentEl.append(graphContainer)
+		const backgroundColor = window.getComputedStyle( graphContainer ,null).getPropertyValue('background-color')
+
+		const fontColor = window.getComputedStyle( graphContainer ,null).getPropertyValue('color')
 
 		type EChartsOption = echarts.EChartsOption;
 
@@ -114,13 +117,22 @@ export class GraphModal extends Modal {
 
 		option = {
 			title: {
-				text: 'Vault size history'
+				text: 'Vault size history',
+				textStyle: {
+					color: fontColor,
+				}
+			},
+			textStyle: {
+				color: fontColor,
 			},
 			tooltip: {
 				trigger: 'axis'
 			},
 			legend: {
-				data: ['Markdown files', 'Other files', 'All files']
+				data: ['Markdown files', 'Other files', 'All files'],
+				textStyle: {
+					color: fontColor,
+				}
 			},
 			grid: {
 				left: '6%',
@@ -164,7 +176,7 @@ export class GraphModal extends Modal {
 			]
 		};
 
-		option && myChart.setOption(option);
+		myChart.setOption(option);
 
 		const legendCallback: EventCallback = function (params: EventCallback) {}
 

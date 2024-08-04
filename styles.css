@@ -11,6 +11,8 @@ If your plugin does not need CSS, delete this file.
 	width: 1000px;
 	height: 800px;
 	margin-top: 10px;
+	background-color: var(--modal-background);
+	color: var(--h1-color);
 }
 
 .technerium-vshp-graph-modal{
@@ -25,3 +27,4 @@ If your plugin does not need CSS, delete this file.
 .technerium-vshp-settings-credits-p {
 	font-size: small;
 }
+
