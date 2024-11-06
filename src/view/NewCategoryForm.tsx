@@ -89,7 +89,7 @@ export function NewCategoryForm(props: NewCategoryFormParams) {
 						<button onClick={addExcludedFolderCategory}>Exclude Folder ABC</button>
 					</div>
 					<div className="technerium-vshp-settings-category-form-helper-actions">
-						<button onClick={addExcludedFolderCategory}>Exclude Folders ABC, DEF</button>
+						<button onClick={addExcludedFoldersCategory}>Exclude Folders ABC, DEF</button>
 					</div>
 				</div>
 			</div>
