@@ -28,3 +28,103 @@ If your plugin does not need CSS, delete this file.
 	font-size: small;
 }
 
+.technerium-vshp-settings-form {
+
+}
+
+.technerium-vshp-settings-setting {
+	display: flex;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+.technerium-vshp-settings-setting-categories {
+	display: flex;
+	padding: 5px;
+}
+.technerium-vshp-settings-setting-categories-list {
+	padding: 5px;
+}
+
+.technerium-vshp-settings-setting-info {
+	padding: 5px;
+}
+
+.technerium-vshp-settings-setting-info-name {
+	color: var(--text-normal);
+	font-size: var(--font-ui-medium);
+	line-height: var(--line-height-tight);
+}
+
+.technerium-vshp-settings-setting-info-desc {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	padding-top: var(--size-4-1);
+	line-height: var(--line-height-tight);
+}
+
+.technerium-vshp-settings-setting-control {
+	padding: 5px;
+	flex: 1 0 150px;
+	text-align: right;
+}
+
+.technerium-vshp-settings-setting-control>select {
+	/*width: 100%;*/
+}
+
+
+.technerium-vshp-settings-category-form {
+	display: flex;
+	padding: 3px;
+}
+
+.technerium-vshp-settings-category-form-grab-area {
+	padding: 5px;
+	text-align: center;
+	vertical-align: middle;
+	cursor: grab;
+}
+
+.technerium-vshp-settings-category-form-name {
+	flex: 1;
+}
+
+.technerium-vshp-settings-category-form-name > input {
+	width: 100%;
+}
+
+.technerium-vshp-settings-category-form-pattern {
+	flex: 0 0 250px;
+	padding: 0 5px;
+}
+
+.technerium-vshp-settings-category-form-pattern > input {
+	width: 100%;
+}
+
+.technerium-vshp-settings-category-form-actions {
+	flex: 0 0 100px;
+}
+
+.technerium-vshp-settings-category-form-actions > button {
+	width: 100%;
+}
+
+
+.technerium-vshp-settings-category-form-helper-container {
+	flex: 1 0 auto;
+}
+
+.technerium-vshp-settings-category-form-helper-row {
+	display: flex;
+}
+
+.technerium-vshp-settings-category-form-helper-actions {
+	flex: 1;
+	padding: 3px;
+}
+
+.technerium-vshp-settings-category-form-helper-actions > button {
+	width: 100%;
+}
+
