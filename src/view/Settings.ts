@@ -47,7 +47,7 @@ export const DEFAULT_SETTINGS: VaultSizeHistoryPluginSettings = {
 
 export class MainSettingTab extends PluginSettingTab {
 	plugin: VaultSizeHistoryPlugin;
-	reactRoot: Root
+	reactRoot: Root | null
 
 	constructor(app: App, plugin: VaultSizeHistoryPlugin) {
 		super(app, plugin);
@@ -61,6 +61,14 @@ export class MainSettingTab extends PluginSettingTab {
 			this.reactRoot = createRoot(containerEl)
 		}
 		this.reactRoot.render(createForm(this.app, this.plugin))
+	}
+
+	hide(): any {
+		if (this.reactRoot) {
+			this.reactRoot.unmount()
+		}
+		this.reactRoot = null
+		return super.hide();
 	}
 }
 
