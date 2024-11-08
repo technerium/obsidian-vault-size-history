@@ -170,6 +170,33 @@ export class GraphModal extends Modal {
 		this.plugin = plugin
 	}
 
+	checkPattern(patternSrc: string, filePath: string): boolean {
+		const pattern = patternSrc.trim()
+		if(pattern.startsWith(':regex:')){
+			try {
+				const regex = new RegExp(pattern.replace(':regex:', ''));
+				return regex.test(filePath)
+			}catch (e){
+				return false
+			}
+		}else if(pattern.startsWith(':in:[') || pattern.startsWith(':not_in:[')){
+			let include = pattern.startsWith(':in:[')
+			let namesStr = pattern.replace(':in:[', '')
+				.replace(':not_in:[', '')
+			if(pattern.endsWith(']')){
+				namesStr = namesStr.substring(0, namesStr.length - 1)
+			}
+			const names = namesStr.split(':');
+			for(const name of names){
+				if(filePath.startsWith(name)){
+					return include
+				}
+			}
+			return !include
+		}
+		return filePath.startsWith(pattern)
+	}
+
 	async getGraphData(): Promise<GraphData> {
 		const { vault } = this.app
 		const plugin = this.plugin
@@ -187,46 +214,18 @@ export class GraphModal extends Modal {
 
 			for(const category of singleApplyCategories) {
 				const pattern = category.pattern
-				if(pattern.startsWith(':regex:')){
-					try {
-						const regex = new RegExp(pattern.replace(':regex:', ''));
-						if (regex.test(filePath)) {
-							matchingCategories.push(category)
-							matchFound = true
-							break
-						}
-					}catch (e){
-
-					}
-				}else{
-					if(filePath.startsWith(pattern)){
-						matchingCategories.push(category)
-						matchFound = true
-						break
-					}
+				matchFound = this.checkPattern(pattern, filePath)
+				if(matchFound) {
+					matchingCategories.push(category)
+					break
 				}
 			}
 
 			for(const category of alwaysApplyCategories) {
 				const pattern = category.pattern
 
-				if(pattern.startsWith(':regex:')){
-					try {
-						const regex = new RegExp(pattern.replace(':regex:', ''));
-						if (regex.test(filePath)) {
-							matchingCategories.push(category)
-						}
-					}catch (e){
-
-					}
-				}else if(pattern == ':???:'){
-					if(!matchFound){
-						matchingCategories.push(category)
-					}
-				}else{
-					if(filePath.startsWith(pattern)){
-						matchingCategories.push(category)
-					}
+				if(this.checkPattern(pattern, filePath)){
+					matchingCategories.push(category)
 				}
 			}
 

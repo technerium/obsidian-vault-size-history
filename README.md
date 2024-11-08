@@ -41,6 +41,8 @@ Plugin takes full path to a file within Vault when checking the criterion.
 Currently supported types of filters are:
 
 - Plain text e.g. 'Examples'. The plugin will check if full path to a file starts with the specified text.
+- List of folders. Define list using format `:in:[Folder Name 1:Folder Name 2:Folder Name 3]` and the plugin will count files in these folders.
+- List of folders (negative match). Define list using format `:not_in:[Folder Name 1:Folder Name 2:Folder Name 3]` and the plugin will count files that are not in these folders.
 - Regular expression. To define the filter, preface the regular expression with `:regex:`. The plugin applies the expression to the full path to the file, which allows to specify criteria based on folder name, file name or file extension.
 
 There are two types of categories.
@@ -68,7 +70,7 @@ The exclusive list of categories is defined as following:
 
 If Other Files filter was the only filter in the list, it would display total number of files in the Vault. But being part of exclusive list in the last place, it will only show a subset of files that do not match other filters from this list.
 
-So what if we want to the total number of files along with categories defined above? 
+So what if we want to show the total number of files along with categories defined above? 
 
 This is done using inclusive list. We can use the same filter when specifying a new category in this list:
 

@@ -40,11 +40,15 @@ export function NewCategoryForm(props: NewCategoryFormParams) {
 	}
 
 	const addExcludedFolderCategory = () => {
-		publishCreate('Not in ABC folder', ':regex:^(?!ABC)$')
+		publishCreate('Not in ABC folder', ':not_in:[ABC]')
 	}
 
 	const addExcludedFoldersCategory = () => {
-		publishCreate('Not in ABC, DEF folder', ':regex:^(?!ABC|DEF)$')
+		publishCreate('Not in ABC, DEF folders', ':not_in:[ABC:DEF]')
+	}
+
+	const addIncludedFoldersCategory = () => {
+		publishCreate('In ABC, DEF folders', ':in:[ABC:DEF]')
 	}
 
 	return <>
@@ -86,10 +90,13 @@ export function NewCategoryForm(props: NewCategoryFormParams) {
 				</div>
 				<div className="technerium-vshp-settings-category-form-helper-row">
 					<div className="technerium-vshp-settings-category-form-helper-actions">
-						<button onClick={addExcludedFolderCategory}>Exclude Folder ABC</button>
+						<button onClick={addExcludedFolderCategory}>Not in folder ABC</button>
 					</div>
 					<div className="technerium-vshp-settings-category-form-helper-actions">
-						<button onClick={addExcludedFoldersCategory}>Exclude Folders ABC, DEF</button>
+						<button onClick={addExcludedFoldersCategory}>Not in folders ABC, DEF</button>
+					</div>
+					<div className="technerium-vshp-settings-category-form-helper-actions">
+						<button onClick={addIncludedFoldersCategory}>In Folders ABC, DEF</button>
 					</div>
 				</div>
 			</div>
