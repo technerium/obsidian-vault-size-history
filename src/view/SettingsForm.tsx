@@ -197,7 +197,16 @@ export const SettingsForm = (props: FormProps) => {
 					  obsidianApp={obsidianApp}
 					  obsidianPlugin={plugin} listId={multiMatchListId}/>
 
-		<br/>
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
+					&nbsp;
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Documentation and examples are available on our GitHub page: <a href="https://github.com/technerium/obsidian-vault-size-history">Vault Size History for Obsidian</a>
+				</div>
+			</div>
+		</div>
 
 		<div className="technerium-vshp-settings-setting">
 			<div className="technerium-vshp-settings-setting-info">

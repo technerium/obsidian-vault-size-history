@@ -8,16 +8,15 @@ If your plugin does not need CSS, delete this file.
 */
 
 .technerium-vshp-graph-container{
-	width: 1000px;
-	height: 800px;
-	margin-top: 10px;
+	width: 100%;
+	height: calc(100% - 28px);
 	background-color: var(--modal-background);
 	color: var(--h1-color);
 }
 
 .technerium-vshp-graph-modal{
-	width: auto;
-	height: auto;
+	width: var(--modal-width);
+	height: var(--modal-height);
 }
 
 .technerium-vshp-settings-credits-section{
