@@ -1,7 +1,7 @@
 {
 	"id": "vault-size-history",
 	"name": "Vault Size History",
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"minAppVersion": "0.15.0",
 	"description": "Graph of the number of files in the Vault.",
 	"author": "Technerium",

@@ -11,14 +11,22 @@ export interface FileCategory {
 	alwaysApply: boolean;
 }
 
+export enum LegendOrder {
+	// Potentially, we can implement order by name, color, rank or other attributes
+	ASCENDING_CHART_VALUE = 'ASCENDING_CHART_VALUE',
+	DESCENDING_CHART_VALUE = 'DESCENDING_CHART_VALUE',
+}
+
 export interface VaultSizeHistoryPluginSettings {
 	dateFormat: string
+	legendOrder: LegendOrder
 	categories: FileCategory[]
 	startDateBasedOn: number
 }
 
 export const DEFAULT_SETTINGS: VaultSizeHistoryPluginSettings = {
 	dateFormat: 'm/d/yy',
+	legendOrder: LegendOrder.ASCENDING_CHART_VALUE,
 	categories: [
 		{
 			id: 1,

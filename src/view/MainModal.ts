@@ -2,7 +2,7 @@ import {App, Modal} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import * as echarts from 'echarts';
 import dateFormat from 'dateformat';
-import {FileCategory} from "./Settings";
+import {FileCategory, LegendOrder} from "./Settings";
 
 export const GRAPH_MODAL_TYPE = "technerium-vshp-graph-modal";
 
@@ -42,18 +42,24 @@ class LineData {
 	category: FileCategory
 	minDate: Date
 	maxDate: Date
+	cumulativeTotal: number
 
 	constructor(category: FileCategory) {
 		this.series = {}
 		this.category = category
+		this.cumulativeTotal = 0
 	}
 
 	addEntry(dayDate: Date) {
 		let counter = this.series[dayDate.getTime()];
+		//Increment and store counter for a particular day
 		if(!counter)
 			counter = 0
 		counter++
 		this.series[dayDate.getTime()] = counter;
+
+		// Store total number of files in this category for further sorting of legend items
+		this.cumulativeTotal++
 
 		if(this.minDate == null || this.minDate > dayDate){
 			this.minDate = new Date(dayDate)
@@ -79,6 +85,13 @@ class GraphData {
 	plugin: VaultSizeHistoryPlugin
 	constructor(plugin: VaultSizeHistoryPlugin) {
 		this.plugin = plugin
+	}
+
+	orderLines(): void {
+		this.lines.sort((a, b) => {
+			const factor = this.plugin.settings.legendOrder == LegendOrder.ASCENDING_CHART_VALUE ? 1 : -1
+			return (a.cumulativeTotal - b.cumulativeTotal) * factor
+		})
 	}
 
 	addEntry(category: FileCategory, dayDate: Date) {
@@ -236,6 +249,8 @@ export class GraphModal extends Modal {
 				}
 			}
 		}
+
+		result.orderLines()
 
 		return result
 	}

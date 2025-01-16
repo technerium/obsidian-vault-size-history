@@ -2,7 +2,7 @@ import {App, Notice} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import {useEffect, useRef, useState} from "react";
 import dateFormat from "dateformat";
-import {DEFAULT_SETTINGS, FileCategory} from "./Settings";
+import {DEFAULT_SETTINGS, FileCategory, LegendOrder} from "./Settings";
 import {CategoryList} from "./CategoryList";
 import {subscribe, unsubscribe} from "../events/CategoryUpdate";
 
@@ -17,6 +17,7 @@ export const SettingsForm = (props: FormProps) => {
 	const multiMatchListId = 'multi';
 
 	const [dateFormatStr, setDateFormatStr] = useState<string>(plugin.settings.dateFormat)
+	const [legendOrder, setLegendOrder] = useState<string>(plugin.settings.legendOrder)
 	const [singleMatchCategories, setSingleMatchCategories] =
 		useState<FileCategory[]>(plugin.settings.categories.filter(c=>!c.alwaysApply))
 	const [multiMatchCategories, setMultiMatchCategories] =
@@ -29,6 +30,11 @@ export const SettingsForm = (props: FormProps) => {
 		plugin.settings.dateFormat = dateFormatStr;
 		plugin.saveSettings().then(()=>{})
 	}, [dateFormatStr])
+
+	useEffect(()=>{
+		plugin.settings.legendOrder = legendOrder as LegendOrder;
+		plugin.saveSettings().then(()=>{})
+	}, [legendOrder])
 
 	useEffect(()=>{
 		plugin.settings.startDateBasedOn = startDateBasedOn;
@@ -156,6 +162,22 @@ export const SettingsForm = (props: FormProps) => {
 					   onChange={(e) => setDateFormatStr(e.target.value)}/>
 			</div>
 		</div>
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
+					Legend Sorting Order
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Control how line titles are displayed in the legend based on their chart values.
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting-control">
+				<select defaultValue={legendOrder} onChange={(e) => setLegendOrder(e.target.value)}>
+					<option key={LegendOrder.ASCENDING_CHART_VALUE} value={LegendOrder.ASCENDING_CHART_VALUE}>Ascending Value</option>
+					<option key={LegendOrder.DESCENDING_CHART_VALUE} value={LegendOrder.DESCENDING_CHART_VALUE}>Descending Value</option>
+				</select>
+			</div>
+		</div>
 		<div className="technerium-vshp-settings-setting-categories">
 			<div className="technerium-vshp-settings-setting-info">
 				<div className="technerium-vshp-settings-setting-info-name">
@@ -203,7 +225,8 @@ export const SettingsForm = (props: FormProps) => {
 					&nbsp;
 				</div>
 				<div className="technerium-vshp-settings-setting-info-desc">
-					Documentation and examples are available on our GitHub page: <a href="https://github.com/technerium/obsidian-vault-size-history">Vault Size History for Obsidian</a>
+					Documentation and examples are available on our GitHub page: <a
+					href="https://github.com/technerium/obsidian-vault-size-history">Vault Size History for Obsidian</a>
 				</div>
 			</div>
 		</div>

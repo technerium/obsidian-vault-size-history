@@ -26,6 +26,16 @@ Examples of supported formats:
 - m/d/yy - 1/28/24
 - yyyy-mm-dd - 2024-01-28
 
+### Legend Sorting Order
+
+This setting controls the order in which line titles are displayed. It allows you to choose how the legend entries are organized based on the chart values. 
+
+The two options available are:
+
+**Ascending Value**: In this option, the legend entries are sorted so that the lines with the lowest chart values appear first. This means that as you read the legend from left to right, the values represented by each line increase.
+
+**Descending Value**: In this option, the legend entries are sorted so that the lines with the highest chart values appear first. This means that as you read the legend from left to right, the values represented by each line decrease.
+
 ### File categories
 
 ![demo_2.png](docs/demo_2.png)
