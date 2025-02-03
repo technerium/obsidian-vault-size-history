@@ -1,4 +1,4 @@
-import {App, Notice} from "obsidian";
+import {App, moment, Notice} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import {useEffect, useRef, useState} from "react";
 import dateFormat from "dateformat";
@@ -17,6 +17,8 @@ export const SettingsForm = (props: FormProps) => {
 	const multiMatchListId = 'multi';
 
 	const [dateFormatStr, setDateFormatStr] = useState<string>(plugin.settings.dateFormat)
+	const [fileDatePropertyStr, setFileDatePropertyStr] = useState<string>(plugin.settings.fileDateProperty)
+	const [fileDatePropertyFormatStr, setFileDatePropertyFormatStr] = useState<string>(plugin.settings.fileDatePropertyFormat)
 	const [legendOrder, setLegendOrder] = useState<string>(plugin.settings.legendOrder)
 	const [singleMatchCategories, setSingleMatchCategories] =
 		useState<FileCategory[]>(plugin.settings.categories.filter(c=>!c.alwaysApply))
@@ -30,6 +32,16 @@ export const SettingsForm = (props: FormProps) => {
 		plugin.settings.dateFormat = dateFormatStr;
 		plugin.saveSettings().then(()=>{})
 	}, [dateFormatStr])
+
+	useEffect(()=>{
+		plugin.settings.fileDateProperty = fileDatePropertyStr;
+		plugin.saveSettings().then(()=>{})
+	}, [fileDatePropertyStr])
+
+	useEffect(()=>{
+		plugin.settings.fileDatePropertyFormat = fileDatePropertyFormatStr;
+		plugin.saveSettings().then(()=>{})
+	}, [fileDatePropertyFormatStr])
 
 	useEffect(()=>{
 		plugin.settings.legendOrder = legendOrder as LegendOrder;
@@ -125,7 +137,7 @@ export const SettingsForm = (props: FormProps) => {
 	}, []);
 
 	const generateReport = async ()=> {
-		const { vault } = obsidianApp
+		const { vault , metadataCache} = obsidianApp
 		const files = vault.getFiles()
 		// files.sort()
 
@@ -135,10 +147,37 @@ export const SettingsForm = (props: FormProps) => {
 		if(csvFile == null) {
 			csvFile = await obsidianApp.vault.create(reportFilePath, '')
 		}
-		await  obsidianApp.vault.modify(csvFile, '"File Path", "Created Date"\n')
+		await  obsidianApp.vault.modify(csvFile, '"File Path", ' +
+			'"Created Date (System)", ' +
+			'"Created Date (Property Value)", ' +
+			'"Created Date (Property Parsed Date)" \n')
 		for(const file of files) {
-			const formattedDate = dateFormat(new Date(file.stat.ctime), plugin.settings.dateFormat)
-			await obsidianApp.vault.append(csvFile, `"${file.path}", ${formattedDate}\n`)
+			const systemFormattedDate = dateFormat(new Date(file.stat.ctime), plugin.settings.dateFormat)
+			let filePropertyDateValue = ''
+			let filePropertyParsedValue = ''
+
+			if(fileDatePropertyStr && fileDatePropertyFormatStr){
+				const fileCache = metadataCache.getFileCache(file)
+				if (fileCache && fileCache.frontmatter) {
+					try{
+						if(fileCache.frontmatter[fileDatePropertyStr]){
+							filePropertyDateValue = fileCache.frontmatter[fileDatePropertyStr]
+							const dateMomentJS = moment(filePropertyDateValue, fileDatePropertyFormatStr, true)
+
+							if(dateMomentJS.isValid()){
+								filePropertyParsedValue = dateFormat(new Date(dateMomentJS.toDate()), plugin.settings.dateFormat)
+							}else{
+								filePropertyParsedValue = 'ERROR'
+							}
+						}
+					}catch (e){
+						console.error(e)
+						filePropertyDateValue = 'ERROR'
+						filePropertyParsedValue = e.message
+					}
+				}
+			}
+			await obsidianApp.vault.append(csvFile, `"${file.path}", ${systemFormattedDate}, ${filePropertyDateValue}, ${filePropertyParsedValue}\n`)
 		}
 
 		new Notice('[Vault size history] CSV report has been generated successfully');
@@ -149,7 +188,7 @@ export const SettingsForm = (props: FormProps) => {
 		<div className="technerium-vshp-settings-setting">
 			<div className="technerium-vshp-settings-setting-info">
 				<div className="technerium-vshp-settings-setting-info-name">
-					Date format
+					Graph date display format
 				</div>
 				<div className="technerium-vshp-settings-setting-info-desc">
 					Define how dates are displayed on the graph. Use 'yyyy','yy' for year, 'mm','m' for month, and
@@ -165,6 +204,36 @@ export const SettingsForm = (props: FormProps) => {
 		<div className="technerium-vshp-settings-setting">
 			<div className="technerium-vshp-settings-setting-info">
 				<div className="technerium-vshp-settings-setting-info-name">
+					Date property
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Specify the name of the file property used to read the file creation date. If the property is missing, the plugin will default to using the system creation date.
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting-control">
+				<input type="text" spellCheck="false" placeholder="creation_date"
+					   value={fileDatePropertyStr}
+					   onChange={(e) => setFileDatePropertyStr(e.target.value)}/>
+			</div>
+		</div>
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
+					Date property format
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Specify the date format of the date property.
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting-control">
+				<input type="text" spellCheck="false" placeholder="mm/dd/yyyy or m/d/yy"
+					   value={fileDatePropertyFormatStr}
+					   onChange={(e) => setFileDatePropertyFormatStr(e.target.value)}/>
+			</div>
+		</div>
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
 					Legend Sorting Order
 				</div>
 				<div className="technerium-vshp-settings-setting-info-desc">
@@ -173,8 +242,12 @@ export const SettingsForm = (props: FormProps) => {
 			</div>
 			<div className="technerium-vshp-settings-setting-control">
 				<select defaultValue={legendOrder} onChange={(e) => setLegendOrder(e.target.value)}>
-					<option key={LegendOrder.ASCENDING_CHART_VALUE} value={LegendOrder.ASCENDING_CHART_VALUE}>Ascending Value</option>
-					<option key={LegendOrder.DESCENDING_CHART_VALUE} value={LegendOrder.DESCENDING_CHART_VALUE}>Descending Value</option>
+					<option key={LegendOrder.ASCENDING_CHART_VALUE} value={LegendOrder.ASCENDING_CHART_VALUE}>Ascending
+						Value
+					</option>
+					<option key={LegendOrder.DESCENDING_CHART_VALUE}
+							value={LegendOrder.DESCENDING_CHART_VALUE}>Descending Value
+					</option>
 				</select>
 			</div>
 		</div>

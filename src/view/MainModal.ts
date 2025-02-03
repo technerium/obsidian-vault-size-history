@@ -1,4 +1,4 @@
-import {App, Modal} from "obsidian";
+import {App, Modal, moment} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import * as echarts from 'echarts';
 import dateFormat from 'dateformat';
@@ -211,10 +211,13 @@ export class GraphModal extends Modal {
 	}
 
 	async getGraphData(): Promise<GraphData> {
-		const { vault } = this.app
+		const { vault , metadataCache} = this.app
 		const plugin = this.plugin
 		const allFiles = vault.getFiles()
 		const categories = plugin.settings.categories
+		const settingDateProperty = plugin.settings.fileDateProperty
+		const settingDatePropertyFormat = plugin.settings.fileDatePropertyFormat
+
 		let result: GraphData = new GraphData(plugin)
 
 		for(const file of allFiles) {
@@ -244,6 +247,28 @@ export class GraphModal extends Modal {
 
 			if(matchingCategories){
 				let fileCDate = new Date(file.stat.ctime)
+
+				try {
+					if(settingDateProperty && settingDatePropertyFormat){
+						const fileCache = metadataCache.getFileCache(file);
+						if (fileCache && fileCache.frontmatter) {
+							if(fileCache.frontmatter[settingDateProperty]){
+								// console.log(fileCache)
+								const dateStr = fileCache.frontmatter[settingDateProperty]
+								const dateMomentJS = moment(dateStr, settingDatePropertyFormat, true)
+
+								if(dateMomentJS.isValid()){
+									fileCDate = dateMomentJS.toDate()
+								}else{
+									console.error('[Vault Size History] Creation date property value [' + dateStr + '] of the file [' + file.path + '] could not be parsed using format ' + settingDatePropertyFormat)
+								}
+							}
+						}
+					}
+				}catch (e){
+					console.error("[Vault Size History] Error while processing creation date property of the file ", e)
+				}
+
 				for(const category of matchingCategories){
 					result.addEntry(category, fileCDate)
 				}

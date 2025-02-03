@@ -19,6 +19,8 @@ export enum LegendOrder {
 
 export interface VaultSizeHistoryPluginSettings {
 	dateFormat: string
+	fileDateProperty: string
+	fileDatePropertyFormat: string
 	legendOrder: LegendOrder
 	categories: FileCategory[]
 	startDateBasedOn: number
@@ -26,6 +28,8 @@ export interface VaultSizeHistoryPluginSettings {
 
 export const DEFAULT_SETTINGS: VaultSizeHistoryPluginSettings = {
 	dateFormat: 'm/d/yy',
+	fileDateProperty: '',
+	fileDatePropertyFormat: '',
 	legendOrder: LegendOrder.ASCENDING_CHART_VALUE,
 	categories: [
 		{

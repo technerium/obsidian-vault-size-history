@@ -16,7 +16,7 @@ By clicking on a line name in the legend, you can hide/show the line.
 
 ## Settings
 
-### Date format
+### Display Date format
 
 It is possible to change the display format of the dates.
 
@@ -25,6 +25,99 @@ Examples of supported formats:
 - mm/dd/yyyy - 01/28/2024
 - m/d/yy - 1/28/24
 - yyyy-mm-dd - 2024-01-28
+
+### Date property
+
+By default, the plugin uses file creation date defined by the system. As per issue #5, system information might not be reliable due to different reasons like file sync/copy when the file is considered recreated.
+
+It is possible to configure a property to be used instead. The `Date property` setting accepts a frontmatter property name to be used to parse the date from.
+
+#### Date property format
+
+`Date property` field's value is parsed to a valid Date using the format defined in the `Date property format`.
+
+It is empty by default and the parsing will not work until the format is defined.
+
+The plugin uses the `Moment.JS` library which is available in Obsidian to work with the dates. Please refer to the library [documentation](https://momentjs.com/docs/#/parsing/string-format/) for the full list of supported formats.
+
+#### Examples
+
+##### Date formats
+
+`YYYY-MM-DD HH:mm:ss` - 2023-01-31 15:04:49
+`MM/DD/YY hh:mm:ssA` - 10/31/2020 03:04:49PM
+
+##### Date property configuration
+
+![demo_2.png](docs/created_date_property_settings.png)
+
+![demo_2.png](docs/created_date_property_example.png)
+
+##### Date formatting options
+
+Year:
+
+`YYYY`: 4-digit year
+
+`YY`: 2-digit year
+
+Month:
+
+`MMMM`: Full month name (e.g., January)
+
+`MMM`: Abbreviated month name (e.g., Jan)
+
+`MM`: 2-digit month (e.g., 01)
+
+`M`: Month number (e.g., 1)
+
+Day of Month:
+
+`DD`: 2-digit day of the month (e.g., 01)
+
+`D`: Day of the month (e.g., 1)
+
+Day of Week:
+
+`dddd`: Full name of the day (e.g., Monday)
+
+`ddd`: Abbreviated name of the day (e.g., Mon)
+
+`dd`: Minimized name of the day (e.g., Mo)
+
+Hour:
+
+`HH`: 2-digit hour in 24-hour format (e.g., 14)
+
+`H`: Hour in 24-hour format (e.g., 14)
+
+`hh`: 2-digit hour in 12-hour format (e.g., 02)
+
+`h`: Hour in 12-hour format (e.g., 2)
+
+Minute:
+
+`mm`: 2-digit minute (e.g., 05)
+
+`m`: Minute (e.g., 5)
+
+Second:
+
+`ss`: 2-digit second (e.g., 09)
+
+`s`: Second (e.g., 9)
+
+AM/PM:
+
+`A`: AM/PM
+
+`a`: am/pm
+
+Timezone:
+
+`Z`: Timezone offset (e.g., +05:00)
+
+`ZZ`: Timezone offset without colon (e.g., +0500)
 
 ### Legend Sorting Order
 
