@@ -36,6 +36,11 @@ If your plugin does not need CSS, delete this file.
 	padding: 5px;
 	margin-bottom: 10px;
 }
+.technerium-vshp-settings-separator {
+	width: 100%;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
 .technerium-vshp-settings-setting-categories {
 	display: flex;
 	padding: 5px;

@@ -1,10 +1,10 @@
 import {App, moment, Notice} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import {useEffect, useRef, useState} from "react";
-import dateFormat from "dateformat";
 import {DEFAULT_SETTINGS, FileCategory, LegendOrder} from "./Settings";
 import {CategoryList} from "./CategoryList";
 import {subscribe, unsubscribe} from "../events/CategoryUpdate";
+import {indexDateFormat} from "../util/Constants";
 
 interface FormProps {
 	obsidianApp: App
@@ -16,9 +16,11 @@ export const SettingsForm = (props: FormProps) => {
 	const singleMatchListId = 'single';
 	const multiMatchListId = 'multi';
 
-	const [dateFormatStr, setDateFormatStr] = useState<string>(plugin.settings.dateFormat)
+	const [dateFormatStr, setDateFormatStr] = useState<string>(plugin.settings.graphDateFormat)
 	const [fileDatePropertyStr, setFileDatePropertyStr] = useState<string>(plugin.settings.fileDateProperty)
 	const [fileDatePropertyFormatStr, setFileDatePropertyFormatStr] = useState<string>(plugin.settings.fileDatePropertyFormat)
+	const [fileIndexEnabled, setFileIndexEnabled] = useState<boolean>(plugin.settings.fileIndexEnabled)
+	const [fileIndexPath, setFileIndexPath] = useState<string>(plugin.settings.fileIndexPath)
 	const [legendOrder, setLegendOrder] = useState<string>(plugin.settings.legendOrder)
 	const [singleMatchCategories, setSingleMatchCategories] =
 		useState<FileCategory[]>(plugin.settings.categories.filter(c=>!c.alwaysApply))
@@ -29,7 +31,7 @@ export const SettingsForm = (props: FormProps) => {
 	const reportFilePath = 'VaultFiles.csv'
 
 	useEffect(()=>{
-		plugin.settings.dateFormat = dateFormatStr;
+		plugin.settings.graphDateFormat = dateFormatStr;
 		plugin.saveSettings().then(()=>{})
 	}, [dateFormatStr])
 
@@ -42,6 +44,16 @@ export const SettingsForm = (props: FormProps) => {
 		plugin.settings.fileDatePropertyFormat = fileDatePropertyFormatStr;
 		plugin.saveSettings().then(()=>{})
 	}, [fileDatePropertyFormatStr])
+
+	useEffect(()=>{
+		plugin.settings.fileIndexEnabled = fileIndexEnabled;
+		plugin.saveSettings().then(()=>{})
+	}, [fileIndexEnabled])
+
+	useEffect(()=>{
+		plugin.settings.fileIndexPath = fileIndexPath;
+		plugin.saveSettings().then(()=>{})
+	}, [fileIndexPath])
 
 	useEffect(()=>{
 		plugin.settings.legendOrder = legendOrder as LegendOrder;
@@ -136,6 +148,11 @@ export const SettingsForm = (props: FormProps) => {
 		}
 	}, []);
 
+
+	const rebuildIndex = async ()=> {
+		await plugin.fileIndex.updateFileIndex(true)
+	}
+
 	const generateReport = async ()=> {
 		const { vault , metadataCache} = obsidianApp
 		const files = vault.getFiles()
@@ -152,7 +169,11 @@ export const SettingsForm = (props: FormProps) => {
 			'"Created Date (Property Value)", ' +
 			'"Created Date (Property Parsed Date)" \n')
 		for(const file of files) {
-			const systemFormattedDate = dateFormat(new Date(file.stat.ctime), plugin.settings.dateFormat)
+			// TODO:
+			// For system file property use default value of fileDatePropertyFormat if not specified by user
+			// For frontmatter properties use fileDatePropertyFormat if specified by user
+			const reportDateFormat = indexDateFormat
+			const systemFormattedDate = moment(new Date(file.stat.ctime)).format(reportDateFormat)
 			let filePropertyDateValue = ''
 			let filePropertyParsedValue = ''
 
@@ -165,7 +186,7 @@ export const SettingsForm = (props: FormProps) => {
 							const dateMomentJS = moment(filePropertyDateValue, fileDatePropertyFormatStr, true)
 
 							if(dateMomentJS.isValid()){
-								filePropertyParsedValue = dateFormat(new Date(dateMomentJS.toDate()), plugin.settings.dateFormat)
+								filePropertyParsedValue =  moment(new Date(dateMomentJS.toDate())).format(reportDateFormat)
 							}else{
 								filePropertyParsedValue = 'ERROR'
 							}
@@ -185,52 +206,24 @@ export const SettingsForm = (props: FormProps) => {
 
 
 	return <div className="technerium-vshp-settings-form">
+		<h3>Graph</h3>
 		<div className="technerium-vshp-settings-setting">
 			<div className="technerium-vshp-settings-setting-info">
 				<div className="technerium-vshp-settings-setting-info-name">
 					Graph date display format
 				</div>
 				<div className="technerium-vshp-settings-setting-info-desc">
-					Define how dates are displayed on the graph. Use 'yyyy','yy' for year, 'mm','m' for month, and
-					'dd','d' for day.
+					Define how dates are displayed on the graph. Use 'YYYY','YY' for year, 'MM','M' for month, and
+					'DD','D' for day (case sensitive).
 				</div>
 			</div>
 			<div className="technerium-vshp-settings-setting-control">
-				<input type="text" spellCheck="false" placeholder="mm/dd/yyyy or m/d/yy"
+				<input type="text" spellCheck="false" placeholder="MM/DD/YYYY or M/D/YY"
 					   value={dateFormatStr}
 					   onChange={(e) => setDateFormatStr(e.target.value)}/>
 			</div>
 		</div>
-		<div className="technerium-vshp-settings-setting">
-			<div className="technerium-vshp-settings-setting-info">
-				<div className="technerium-vshp-settings-setting-info-name">
-					Date property
-				</div>
-				<div className="technerium-vshp-settings-setting-info-desc">
-					Specify the name of the file property used to read the file creation date. If the property is missing, the plugin will default to using the system creation date.
-				</div>
-			</div>
-			<div className="technerium-vshp-settings-setting-control">
-				<input type="text" spellCheck="false" placeholder="creation_date"
-					   value={fileDatePropertyStr}
-					   onChange={(e) => setFileDatePropertyStr(e.target.value)}/>
-			</div>
-		</div>
-		<div className="technerium-vshp-settings-setting">
-			<div className="technerium-vshp-settings-setting-info">
-				<div className="technerium-vshp-settings-setting-info-name">
-					Date property format
-				</div>
-				<div className="technerium-vshp-settings-setting-info-desc">
-					Specify the date format of the date property.
-				</div>
-			</div>
-			<div className="technerium-vshp-settings-setting-control">
-				<input type="text" spellCheck="false" placeholder="mm/dd/yyyy or m/d/yy"
-					   value={fileDatePropertyFormatStr}
-					   onChange={(e) => setFileDatePropertyFormatStr(e.target.value)}/>
-			</div>
-		</div>
+
 		<div className="technerium-vshp-settings-setting">
 			<div className="technerium-vshp-settings-setting-info">
 				<div className="technerium-vshp-settings-setting-info-name">
@@ -341,6 +334,102 @@ export const SettingsForm = (props: FormProps) => {
 			</div>
 			<div className="technerium-vshp-settings-setting-control">
 				<button onClick={resetCategories}>Reset categories</button>
+			</div>
+		</div>
+		<div className="technerium-vshp-settings-separator"></div>
+		<h3>File metadata</h3>
+		<p>
+			By default, the plugin relies on the system file creation date.
+		</p>
+		<p>
+			There are two additional ways to define file creation dates: using an index file and using a frontmatter property in the notes.
+		</p>
+		<p>
+			If both options are configured, the frontmatter property always takes precedence over the value in the index file.
+		</p>
+		<h4>In-Note date property</h4>
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
+					Date property
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Specify the name of the file property used to read the file creation date. If the property is
+					missing, the plugin will default to using the system creation date.
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting-control">
+				<input type="text" spellCheck="false" placeholder="creation_date"
+					   value={fileDatePropertyStr}
+					   onChange={(e) => setFileDatePropertyStr(e.target.value)}/>
+			</div>
+		</div>
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
+					Date property format
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Specify the date format of the date property.
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting-control">
+				<input type="text" spellCheck="false" placeholder="MM/DD/YYYY or M/D/YY"
+					   value={fileDatePropertyFormatStr}
+					   onChange={(e) => setFileDatePropertyFormatStr(e.target.value)}/>
+			</div>
+		</div>
+		<h4>Automated file index</h4>
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
+					Enable file index
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Enable tracking of file creation dates in a CSV file
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting-control">
+				<input type="checkbox"
+					   checked={fileIndexEnabled}
+					   onChange={(e) => setFileIndexEnabled(!fileIndexEnabled)}/>
+			</div>
+		</div>
+
+		{fileIndexEnabled && <div className="technerium-vshp-settings-setting">
+				<div className="technerium-vshp-settings-setting-info">
+					<div className="technerium-vshp-settings-setting-info-name">
+						File creation date index
+					</div>
+					<div className="technerium-vshp-settings-setting-info-desc">
+						Specify path to a csv file containing the file creation date index
+					</div>
+				</div>
+				<div className="technerium-vshp-settings-setting-control">
+					<input type="text" spellCheck="false" placeholder="path to file a csv file"
+						   value={fileIndexPath}
+						   onChange={(e) => setFileIndexPath(e.target.value)}/>
+				</div>
+			</div>
+		}
+
+
+		<div className="technerium-vshp-settings-separator"></div>
+
+		<h3>Troubleshooting</h3>
+
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
+					Rebuild file index now
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Rebuild index of file creation dates now. The index file will be located as specified by the "File
+					creation date index" option or in the root of the Vault.
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting-control">
+				<button onClick={rebuildIndex}>Rebuild index</button>
 			</div>
 		</div>
 

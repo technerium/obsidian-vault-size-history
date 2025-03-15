@@ -1,8 +1,8 @@
-import {App, Modal, moment} from "obsidian";
+import {App, Modal, moment, Notice} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import * as echarts from 'echarts';
-import dateFormat from 'dateformat';
 import {FileCategory, LegendOrder} from "./Settings";
+import Papa from "papaparse";
 
 export const GRAPH_MODAL_TYPE = "technerium-vshp-graph-modal";
 
@@ -78,6 +78,7 @@ class LineData {
 	}
 }
 
+
 class GraphData {
 	lines: LineData[] = []
 	minDate: Date | null = null
@@ -135,7 +136,7 @@ class GraphData {
 	}
 
 	getXScaleItems(): string[] {
-		return this.__getDateRange().map(d=> dateFormat(d, this.plugin.settings.dateFormat))
+		return this.__getDateRange().map(d=> moment(d).format(this.plugin.settings.graphDateFormat))
 	}
 
 	getEChartSeries(): EChartSeriesitem[] {
@@ -173,8 +174,6 @@ class GraphData {
 }
 
 
-
-
 export class GraphModal extends Modal {
 	plugin: VaultSizeHistoryPlugin;
 
@@ -182,6 +181,7 @@ export class GraphModal extends Modal {
 		super(app);
 		this.plugin = plugin
 	}
+
 
 	checkPattern(patternSrc: string, filePath: string): boolean {
 		const pattern = patternSrc.trim()
@@ -217,6 +217,7 @@ export class GraphModal extends Modal {
 		const categories = plugin.settings.categories
 		const settingDateProperty = plugin.settings.fileDateProperty
 		const settingDatePropertyFormat = plugin.settings.fileDatePropertyFormat
+		const fileDataIndex = plugin.fileIndex.getFileDataIndex()
 
 		let result: GraphData = new GraphData(plugin)
 
@@ -247,6 +248,10 @@ export class GraphModal extends Modal {
 
 			if(matchingCategories){
 				let fileCDate = new Date(file.stat.ctime)
+				// console.log(`2. file date ${fileCDate} vs ${fileDataIndex[file.path]}`)
+				if(fileDataIndex[file.path]){
+					fileCDate = fileDataIndex[file.path].creationDate
+				}
 
 				try {
 					if(settingDateProperty && settingDatePropertyFormat){

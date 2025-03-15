@@ -18,18 +18,22 @@ export enum LegendOrder {
 }
 
 export interface VaultSizeHistoryPluginSettings {
-	dateFormat: string
+	graphDateFormat: string
 	fileDateProperty: string
 	fileDatePropertyFormat: string
+	fileIndexEnabled: boolean
+	fileIndexPath: string
 	legendOrder: LegendOrder
 	categories: FileCategory[]
 	startDateBasedOn: number
 }
 
 export const DEFAULT_SETTINGS: VaultSizeHistoryPluginSettings = {
-	dateFormat: 'm/d/yy',
+	graphDateFormat: 'M/D/YY',
 	fileDateProperty: '',
 	fileDatePropertyFormat: '',
+	fileIndexEnabled: false,
+	fileIndexPath: 'file_index.csv',
 	legendOrder: LegendOrder.ASCENDING_CHART_VALUE,
 	categories: [
 		{
