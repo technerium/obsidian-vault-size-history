@@ -20,6 +20,7 @@ export const SettingsForm = (props: FormProps) => {
 	const [fileDatePropertyStr, setFileDatePropertyStr] = useState<string>(plugin.settings.fileDateProperty)
 	const [fileDatePropertyFormatStr, setFileDatePropertyFormatStr] = useState<string>(plugin.settings.fileDatePropertyFormat)
 	const [fileIndexEnabled, setFileIndexEnabled] = useState<boolean>(plugin.settings.fileIndexEnabled)
+	const [fileDeletionIndexEnabled, setFileDeletionIndexEnabled] = useState<boolean>(plugin.settings.fileDeletionIndexEnabled)
 	const [fileIndexPath, setFileIndexPath] = useState<string>(plugin.settings.fileIndexPath)
 	const [legendOrder, setLegendOrder] = useState<string>(plugin.settings.legendOrder)
 	const [singleMatchCategories, setSingleMatchCategories] =
@@ -49,6 +50,11 @@ export const SettingsForm = (props: FormProps) => {
 		plugin.settings.fileIndexEnabled = fileIndexEnabled;
 		plugin.saveSettings().then(()=>{})
 	}, [fileIndexEnabled])
+
+	useEffect(()=>{
+		plugin.settings.fileDeletionIndexEnabled = fileDeletionIndexEnabled;
+		plugin.saveSettings().then(()=>{})
+	}, [fileDeletionIndexEnabled])
 
 	useEffect(()=>{
 		plugin.settings.fileIndexPath = fileIndexPath;
@@ -336,16 +342,39 @@ export const SettingsForm = (props: FormProps) => {
 				<button onClick={resetCategories}>Reset categories</button>
 			</div>
 		</div>
+		<div className="technerium-vshp-settings-setting">
+			<div className="technerium-vshp-settings-setting-info">
+				<div className="technerium-vshp-settings-setting-info-name">
+					Track file deletion
+				</div>
+				<div className="technerium-vshp-settings-setting-info-desc">
+					Enable tracking of file deletion dates in the graph.
+					If enabled, the graph will decrease on the dates when files have been deleted.
+					If disabled, the graph is cumulative, meaning it will always increase but will be based on the currently existing files.
+					To activate this setting, the <b>Automated file index</b> must be enabled.
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting-control">
+				<input type="checkbox"
+					   disabled={!fileIndexEnabled}
+					   checked={fileIndexEnabled && fileDeletionIndexEnabled}
+					   onChange={(e) => setFileDeletionIndexEnabled(!fileDeletionIndexEnabled)}/>
+			</div>
+		</div>
+
+
 		<div className="technerium-vshp-settings-separator"></div>
 		<h3>File metadata</h3>
 		<p>
 			By default, the plugin relies on the system file creation date.
 		</p>
 		<p>
-			There are two additional ways to define file creation dates: using an index file and using a frontmatter property in the notes.
+			There are two additional ways to define file creation dates: using an index file and using a frontmatter
+			property in the notes.
 		</p>
 		<p>
-			If both options are configured, the frontmatter property always takes precedence over the value in the index file.
+			If both options are configured, the frontmatter property always takes precedence over the value in the index
+			file.
 		</p>
 		<h4>In-Note date property</h4>
 		<div className="technerium-vshp-settings-setting">
@@ -396,7 +425,8 @@ export const SettingsForm = (props: FormProps) => {
 			</div>
 		</div>
 
-		{fileIndexEnabled && <div className="technerium-vshp-settings-setting">
+		{fileIndexEnabled && <>
+			<div className="technerium-vshp-settings-setting">
 				<div className="technerium-vshp-settings-setting-info">
 					<div className="technerium-vshp-settings-setting-info-name">
 						File creation date index
@@ -411,6 +441,7 @@ export const SettingsForm = (props: FormProps) => {
 						   onChange={(e) => setFileIndexPath(e.target.value)}/>
 				</div>
 			</div>
+		</>
 		}
 
 

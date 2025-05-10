@@ -8,6 +8,7 @@ type FileIndexEntry = {
 	path: string;
 	creationDate: Date;
 	isProtected: boolean;
+	deletionDate: Date|null;
 }
 
 type IndexMap = {
@@ -71,10 +72,12 @@ export default class FileIndex {
 						const filePath = row[0]
 						const fileDate = moment(row[1], dateFormat).toDate()
 						const entryProtected = row[2] == 'TRUE'
+						const deletionDate = row[3] ? moment(row[3], dateFormat).toDate() : null
 						index[filePath] = {
 							path: filePath,
 							creationDate: fileDate,
-							isProtected: entryProtected
+							isProtected: entryProtected,
+							deletionDate: deletionDate
 						}
 					}
 				}
@@ -127,7 +130,8 @@ export default class FileIndex {
 				{
 					path: file.path,
 					creationDate: fileCreatedDate,
-					isProtected: indexEntry ? indexEntry.isProtected : false
+					isProtected: indexEntry ? indexEntry.isProtected : false,
+					deletionDate: null
 				}
 			)
 			obsidianCachedPaths.push(file.path)
@@ -135,7 +139,12 @@ export default class FileIndex {
 
 		const missingFiles = indexedPaths.filter(element => !obsidianCachedPaths.includes(element))
 		for(const path of missingFiles){
-			updatedIndexEntries.push(index[path])
+			const indexEntryDeletedFile = index[path]
+			if(!indexEntryDeletedFile.deletionDate){
+				indexEntryDeletedFile.deletionDate = new Date()
+			}
+
+			updatedIndexEntries.push(indexEntryDeletedFile)
 		}
 		// Sort index by path i.e. first column
 		updatedIndexEntries.sort((a, b)=>{
@@ -145,9 +154,19 @@ export default class FileIndex {
 		})
 
 		await  obsidianApp.vault.modify(csvFile, '"File Path",' +
-			'"Created Date (System)","Protect Date"\n')
+			'"Created Date (System)","Protect Date","Deleted Date"')
 		for(const row of updatedIndexEntries){
-			await obsidianApp.vault.append(csvFile, `"${row.path}",${moment(row.creationDate).format(indexDateFormat)},${row.isProtected ? 'TRUE' : 'FALSE'}\n`)
+			const creationDateFormatted = moment(row.creationDate).format(indexDateFormat)
+			const isProtectedFormatted = row.isProtected ? 'TRUE' : 'FALSE'
+			let deletionDateFormatted = ''
+			if(row.deletionDate){
+				deletionDateFormatted = moment(row.deletionDate).format(indexDateFormat)
+			}
+
+			await obsidianApp.vault.append(
+				csvFile,
+				`"\n${row.path}",${creationDateFormatted},${isProtectedFormatted},${deletionDateFormatted}`
+			)
 		}
 
 		if(oneTimeExec){

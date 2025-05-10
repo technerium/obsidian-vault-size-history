@@ -2,7 +2,6 @@ import {App, Modal, moment, Notice} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import * as echarts from 'echarts';
 import {FileCategory, LegendOrder} from "./Settings";
-import Papa from "papaparse";
 
 export const GRAPH_MODAL_TYPE = "technerium-vshp-graph-modal";
 
@@ -50,12 +49,16 @@ class LineData {
 		this.cumulativeTotal = 0
 	}
 
-	addEntry(dayDate: Date) {
+	addEntry(dayDate: Date, deletion = false) {
 		let counter = this.series[dayDate.getTime()];
 		//Increment and store counter for a particular day
 		if(!counter)
 			counter = 0
-		counter++
+		if(deletion){
+			counter--
+		} else {
+			counter++
+		}
 		this.series[dayDate.getTime()] = counter;
 
 		// Store total number of files in this category for further sorting of legend items
@@ -95,7 +98,7 @@ class GraphData {
 		})
 	}
 
-	addEntry(category: FileCategory, dayDate: Date) {
+	addEntry(category: FileCategory, dayDate: Date, deletion = false) {
 		let normalizedDate = new Date(dayDate);
 		normalizedDate.setHours(12,0,0,0)
 
@@ -104,7 +107,7 @@ class GraphData {
 			lineData = new LineData(category)
 			this.lines.push(lineData)
 		}
-		lineData.addEntry(normalizedDate)
+		lineData.addEntry(normalizedDate, deletion)
 
 		if([null, -1].contains(this.plugin.settings.startDateBasedOn) || this.plugin.settings.startDateBasedOn == category.id){
 			if(this.minDate == null || this.minDate > normalizedDate){
@@ -221,6 +224,7 @@ export class GraphModal extends Modal {
 
 		let result: GraphData = new GraphData(plugin)
 
+		// Existing files
 		for(const file of allFiles) {
 			const filePath = file.path
 
@@ -276,6 +280,50 @@ export class GraphModal extends Modal {
 
 				for(const category of matchingCategories){
 					result.addEntry(category, fileCDate)
+				}
+			}
+		}
+
+		// Deleted files
+		if(plugin.settings.fileDeletionIndexEnabled){
+			const deletedFilePaths = Object.keys(fileDataIndex).filter(filePath =>
+				fileDataIndex[filePath].deletionDate != null
+			)
+			console.log('Accounting for deleted files', deletedFilePaths)
+			for(const filePath of deletedFilePaths){
+				let matchingCategories: FileCategory[] = []
+				let matchFound = false
+				const singleApplyCategories: FileCategory[] = categories.filter(c=> !c.alwaysApply)
+				const alwaysApplyCategories: FileCategory[] = categories.filter(c=> c.alwaysApply)
+
+				for(const category of singleApplyCategories) {
+					const pattern = category.pattern
+					matchFound = this.checkPattern(pattern, filePath)
+					if(matchFound) {
+						matchingCategories.push(category)
+						break
+					}
+				}
+
+				for(const category of alwaysApplyCategories) {
+					const pattern = category.pattern
+
+					if(this.checkPattern(pattern, filePath)){
+						matchingCategories.push(category)
+					}
+				}
+
+				if(matchingCategories){
+					const fileCDate = fileDataIndex[filePath].creationDate
+					const fileDDate = fileDataIndex[filePath].deletionDate
+
+
+					for(const category of matchingCategories){
+						result.addEntry(category, fileCDate)
+						if (fileDDate) {
+							result.addEntry(category, fileDDate, true)
+						}
+					}
 				}
 			}
 		}

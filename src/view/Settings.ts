@@ -23,6 +23,7 @@ export interface VaultSizeHistoryPluginSettings {
 	fileDatePropertyFormat: string
 	fileIndexEnabled: boolean
 	fileIndexPath: string
+	fileDeletionIndexEnabled: boolean
 	legendOrder: LegendOrder
 	categories: FileCategory[]
 	startDateBasedOn: number
@@ -33,6 +34,7 @@ export const DEFAULT_SETTINGS: VaultSizeHistoryPluginSettings = {
 	fileDateProperty: '',
 	fileDatePropertyFormat: '',
 	fileIndexEnabled: false,
+	fileDeletionIndexEnabled: false,
 	fileIndexPath: 'file_index.csv',
 	legendOrder: LegendOrder.ASCENDING_CHART_VALUE,
 	categories: [

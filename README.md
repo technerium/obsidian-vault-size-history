@@ -120,6 +120,16 @@ Example: on 1/31/2021 the first note had been created, but Vault has 5 attachmen
 
 Use this button to reset the list of categories to the default.
 
+### Track file deletion
+
+![settings_track_file_deletion.png](docs/settings_track_file_deletion.png)
+
+By default, the plugin counts only files currently present in the vault and renders a cumulative (always increasing) graph. For example, if yesterday the vault had 1000 files, 300 of them were deleted and no files were added, you will see the graph that gets up to 700 files yesterday and stays there today because only those exist in the Vault currently.
+
+If you would like to track file deletion, enable this option. In the example above, you would see the graph getting to 1000 files and then dipping to 700 yesterday.
+
+Since the plugin needs to store the file information somewhere as the files have been deleted, the [Automated file index](#Automated-file-index) must be enabled to activate this option.
+
 ## File metadata
 
 This group of settings allows to control how the plugin should identify file creation dates for the files in the Vault.
