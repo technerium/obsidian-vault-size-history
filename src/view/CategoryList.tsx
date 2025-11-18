@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import {CategoryItem} from "./CategoryItem";
-import {publishList, subscribe, unsubscribe} from "../events/CategoryUpdate";
+import {publishList} from "../events/CategoryUpdate";
 import {NewCategoryForm} from "./NewCategoryForm";
 
 

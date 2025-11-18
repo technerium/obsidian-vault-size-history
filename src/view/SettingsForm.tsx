@@ -484,7 +484,7 @@ export const SettingsForm = (props: FormProps) => {
 					&nbsp;
 				</div>
 				<div className="technerium-vshp-settings-setting-info-desc">
-					This plugin has been built using <a href="https://echarts.apache.org">Apache ECharts</a>
+					This plugin has been built using <a href="https://echarts.apache.org">Apache ECharts</a>, <a href="https://github.com/casesandberg/react-color">React Color</a>.
 				</div>
 			</div>
 		</div>

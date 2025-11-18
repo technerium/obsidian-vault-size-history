@@ -1,5 +1,5 @@
 import Papa from "papaparse";
-import {moment, Notice, Plugin} from "obsidian";
+import {moment, Notice} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import {indexDateFormat, indexRefreshTime} from "./Constants";
 import {DEFAULT_SETTINGS} from "../view/Settings";

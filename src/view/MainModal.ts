@@ -1,4 +1,4 @@
-import {App, Modal, moment, Notice} from "obsidian";
+import {App, Modal, moment} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import * as echarts from 'echarts';
 import {FileCategory, LegendOrder} from "./Settings";
@@ -27,6 +27,7 @@ interface EChartSeriesitem{
 	name: string
 	type: 'line'
 	data: number[]
+	colorBy: 'series'|'data'
 }
 
 enum ChartLines {
@@ -129,6 +130,10 @@ class GraphData {
 		return this.lines.map(ld=>ld.getCategory().name)
 	}
 
+	getColors(): string[] {
+		return this.lines.map(ld=>ld.getCategory().color)
+	}
+
 	__getDateRange(): Date[] {
 		if(this.minDate == null)
 			this.minDate = this.lines[0].minDate
@@ -157,7 +162,8 @@ class GraphData {
 			let echartItem: EChartSeriesitem = {
 				data: [],
 				name: line.category.name,
-				type: "line"
+				type: "line",
+				colorBy: 'series'
 			}
 
 			let resultLineNumbers = []
@@ -361,6 +367,7 @@ export class GraphModal extends Modal {
 		// console.log('graph data', graphData)
 
 		const legendItems = graphData.getLegendStrings()
+		const colors = graphData.getColors()
 		const keys = graphData.getXScaleItems()
 		const graphSeries = graphData.getEChartSeries()
 
@@ -413,6 +420,7 @@ export class GraphModal extends Modal {
 					align: 'right'
 				}
 			},
+			color: colors,
 			series: graphSeries
 		};
 

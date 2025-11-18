@@ -93,12 +93,16 @@ If your plugin does not need CSS, delete this file.
 	flex: 1;
 }
 
+.technerium-vshp-settings-category-form-color {
+	flex: 0 0 30px;
+}
+
 .technerium-vshp-settings-category-form-name > input {
 	width: 100%;
 }
 
 .technerium-vshp-settings-category-form-pattern {
-	flex: 0 0 450px;
+	flex: 0 0 350px;
 	padding: 0 5px;
 }
 
