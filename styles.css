@@ -136,3 +136,6 @@ If your plugin does not need CSS, delete this file.
 	width: 100%;
 }
 
+[id^="rc-editable-input-"],[for^="rc-editable-input-"] {
+	color: var(--text-normal) !important;
+}

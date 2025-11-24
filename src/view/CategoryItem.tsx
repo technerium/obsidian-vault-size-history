@@ -6,6 +6,7 @@ import {publish} from "../events/CategoryUpdate";
 import {ColorResult, SketchPicker} from 'react-color';
 import reactCSS from "reactcss";
 import {Button, Dialog, DialogActions, DialogContent} from "@mui/material";
+import {CustomDialogActions, CustomDialogContent, CustomSketchPicker} from "./styled/ColorPickerElements";
 
 interface SortableItemParams {
 	key: number
@@ -98,12 +99,12 @@ export function CategoryItem(props: SortableItemParams) {
 						<div style={ styles.color } />
 					</div>
 					<Dialog open={displayColorPicker} onClose={()=>{}}>
-						<DialogContent>
-								<SketchPicker color={ category.color } onChange={ onColorChange } />
-						</DialogContent>
-						<DialogActions>
+						<CustomDialogContent>
+								<CustomSketchPicker color={ category.color } onChange={ onColorChange } />
+						</CustomDialogContent>
+						<CustomDialogActions>
 							<Button onClick={handleClose}>Close</Button>
-						</DialogActions>
+						</CustomDialogActions>
 					</Dialog>
 				</div>
 

@@ -1,4 +1,4 @@
-import Papa from "papaparse";
+import Papa, {Parser} from "papaparse";
 import {moment, Notice} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
 import {indexDateFormat, indexRefreshTime} from "./Constants";
@@ -33,9 +33,36 @@ export default class FileIndex {
 	init(){
 		const thisObj = this
 		this.initIndex().then()
+
+		if(this.refreshInterval){
+			clearInterval(this.refreshInterval)
+		}
+
+		let intervalMs = indexRefreshTime
+		if(this.plugin.settings.fileIndexRefreshInterval > 0){
+			intervalMs = this.plugin.settings.fileIndexRefreshInterval * 1000
+		}
 		this.refreshInterval = setInterval(()=>{
 			thisObj.updateFileIndex().then()
-		}, indexRefreshTime)
+		}, intervalMs)
+	}
+
+	restartIndexing() {
+		// console.log("restarting indexing...")
+		const thisObj = this
+		this.initIndex().then()
+
+		if(this.refreshInterval){
+			clearInterval(this.refreshInterval)
+		}
+
+		let intervalMs = indexRefreshTime
+		if(this.plugin.settings.fileIndexRefreshInterval > 0){
+			intervalMs = this.plugin.settings.fileIndexRefreshInterval * 1000
+		}
+		this.refreshInterval = setInterval(()=>{
+			thisObj.updateFileIndex().then()
+		}, intervalMs)
 	}
 
 	destroy() {
@@ -88,6 +115,8 @@ export default class FileIndex {
 	}
 
 	async updateFileIndex(oneTimeExec = false) {
+		// console.log('Updating fileIndex')
+		// new Notice('[Vault size history] Updating file index')
 		if(!this.plugin.settings.fileIndexEnabled && !oneTimeExec){
 			return
 		}
@@ -154,20 +183,17 @@ export default class FileIndex {
 		})
 
 		await  obsidianApp.vault.modify(csvFile, '"File Path",' +
-			'"Created Date (System)","Protect Date","Deleted Date"')
-		for(const row of updatedIndexEntries){
-			const creationDateFormatted = moment(row.creationDate).format(indexDateFormat)
-			const isProtectedFormatted = row.isProtected ? 'TRUE' : 'FALSE'
-			let deletionDateFormatted = ''
-			if(row.deletionDate){
-				deletionDateFormatted = moment(row.deletionDate).format(indexDateFormat)
-			}
+			'"Created Date (System)","Protect Date","Deleted Date"\r\n')
 
-			await obsidianApp.vault.append(
-				csvFile,
-				`"\n${row.path}",${creationDateFormatted},${isProtectedFormatted},${deletionDateFormatted}`
-			)
-		}
+		const newCSVContent = Papa.unparse(updatedIndexEntries, {quotes: true, header: false,
+			columns: [
+				'path', 'creationDate', 'isProtected', 'deletionDate'
+			]})
+
+		await obsidianApp.vault.append(
+			csvFile,
+			newCSVContent
+		)
 
 		if(oneTimeExec){
 			new Notice('[Vault size history] Index file updated successfully');

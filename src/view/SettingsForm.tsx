@@ -1,10 +1,11 @@
 import {App, moment, Notice} from "obsidian";
 import VaultSizeHistoryPlugin from "../../main";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {DEFAULT_SETTINGS, FileCategory, LegendOrder} from "./Settings";
 import {CategoryList} from "./CategoryList";
 import {subscribe, unsubscribe} from "../events/CategoryUpdate";
 import {indexDateFormat} from "../util/Constants";
+import {Slider, Stack, TextField} from "@mui/material";
 
 interface FormProps {
 	obsidianApp: App
@@ -22,6 +23,7 @@ export const SettingsForm = (props: FormProps) => {
 	const [fileIndexEnabled, setFileIndexEnabled] = useState<boolean>(plugin.settings.fileIndexEnabled)
 	const [fileDeletionIndexEnabled, setFileDeletionIndexEnabled] = useState<boolean>(plugin.settings.fileDeletionIndexEnabled)
 	const [fileIndexPath, setFileIndexPath] = useState<string>(plugin.settings.fileIndexPath)
+	const [fileIndexRefreshInterval, setFileIndexRefreshInterval] = useState<number>(plugin.settings.fileIndexRefreshInterval)
 	const [legendOrder, setLegendOrder] = useState<string>(plugin.settings.legendOrder)
 	const [singleMatchCategories, setSingleMatchCategories] =
 		useState<FileCategory[]>(plugin.settings.categories.filter(c=>!c.alwaysApply))
@@ -60,6 +62,13 @@ export const SettingsForm = (props: FormProps) => {
 		plugin.settings.fileIndexPath = fileIndexPath;
 		plugin.saveSettings().then(()=>{})
 	}, [fileIndexPath])
+
+	useEffect(()=>{
+		plugin.settings.fileIndexRefreshInterval = fileIndexRefreshInterval;
+		plugin.saveSettings().then(()=>{
+			plugin.fileIndex.restartIndexing()
+		})
+	}, [fileIndexRefreshInterval])
 
 	useEffect(()=>{
 		plugin.settings.legendOrder = legendOrder as LegendOrder;
@@ -439,6 +448,34 @@ export const SettingsForm = (props: FormProps) => {
 					<input type="text" spellCheck="false" placeholder="path to file a csv file"
 						   value={fileIndexPath}
 						   onChange={(e) => setFileIndexPath(e.target.value)}/>
+				</div>
+			</div>
+			<div className="technerium-vshp-settings-setting">
+				<div className="technerium-vshp-settings-setting-info">
+					<div className="technerium-vshp-settings-setting-info-name">
+						Index refresh time
+					</div>
+					<div className="technerium-vshp-settings-setting-info-desc">
+						Specify index refresh interval, seconds
+					</div>
+				</div>
+				<div className="technerium-vshp-settings-setting-control">
+					<Stack direction="row" spacing={2} alignItems="center">
+						<Slider
+							value={fileIndexRefreshInterval}
+							onChange={(_, newValue) => setFileIndexRefreshInterval(newValue as number)}
+							min={30}
+							max={3600}
+							step={30}
+						/>
+						<TextField
+							type="number"
+							value={fileIndexRefreshInterval}
+							onChange={(event) => setFileIndexRefreshInterval(parseInt(event.target.value))}
+							size="small"
+							style={{ width: 60 }}
+						/>
+					</Stack>
 				</div>
 			</div>
 		</>

@@ -1,9 +1,10 @@
 import React, {useState} from "react";
 import {FileCategory} from "./Settings";
 import {publish} from "../events/CategoryUpdate";
-import {Button, Dialog, DialogActions, DialogContent} from "@mui/material";
-import {ColorResult, SketchPicker} from "react-color";
+import {Button, Dialog} from "@mui/material";
+import {ColorResult} from "react-color";
 import reactCSS from "reactcss";
+import {CustomDialogActions, CustomDialogContent, CustomSketchPicker} from "./styled/ColorPickerElements";
 
 interface NewCategoryFormParams {
 	isMultiMatch: boolean
@@ -87,6 +88,7 @@ export function NewCategoryForm(props: NewCategoryFormParams) {
 		},
 	});
 
+
 	return <>
 		<div className="technerium-vshp-settings-category-form">
 			<div className="technerium-vshp-settings-category-form-color">
@@ -95,12 +97,12 @@ export function NewCategoryForm(props: NewCategoryFormParams) {
 				</div>
 				<Dialog open={displayColorPicker} onClose={() => {
 				}}>
-					<DialogContent>
-						<SketchPicker color={color} onChange={onColorChange}/>
-					</DialogContent>
-					<DialogActions>
+					<CustomDialogContent>
+						<CustomSketchPicker color={color} onChange={onColorChange}/>
+					</CustomDialogContent>
+					<CustomDialogActions>
 						<Button onClick={handleClose}>Close</Button>
-					</DialogActions>
+					</CustomDialogActions>
 				</Dialog>
 			</div>
 			<div className="technerium-vshp-settings-category-form-name">
