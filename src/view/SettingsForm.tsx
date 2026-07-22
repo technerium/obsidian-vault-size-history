@@ -58,17 +58,14 @@ export const SettingsForm = (props: FormProps) => {
 		plugin.saveSettings().then(()=>{})
 	}, [fileDeletionIndexEnabled])
 
-	useEffect(()=>{
-		plugin.settings.fileIndexPath = fileIndexPath;
-		plugin.saveSettings().then(()=>{})
-	}, [fileIndexPath])
 
-	useEffect(()=>{
+	const saveFileIndexRefreshInterval = ()=>{
+		// console.log(fileIndexRefreshInterval)
 		plugin.settings.fileIndexRefreshInterval = fileIndexRefreshInterval;
 		plugin.saveSettings().then(()=>{
 			plugin.fileIndex.restartIndexing()
 		})
-	}, [fileIndexRefreshInterval])
+	}
 
 	useEffect(()=>{
 		plugin.settings.legendOrder = legendOrder as LegendOrder;
@@ -148,6 +145,15 @@ export const SettingsForm = (props: FormProps) => {
 		setMultiMatchCategories([...DEFAULT_SETTINGS.categories.filter(c=>c.alwaysApply)])
 	}
 
+	const handleNewIndexFileName = () => {
+		if(fileIndexPath.startsWith('.')){
+			alert('File name cannot start with a dot.')
+			return
+		}
+		plugin.settings.fileIndexPath = fileIndexPath;
+		plugin.saveSettings().then(()=>{})
+	}
+
 	useEffect(() => {
 		subscribe("update", (e: CustomEvent) => updateCategory(e.detail));
 		subscribe("create", (e: CustomEvent) => createCategory(e.detail));
@@ -165,7 +171,7 @@ export const SettingsForm = (props: FormProps) => {
 
 
 	const rebuildIndex = async ()=> {
-		await plugin.fileIndex.updateFileIndex(true)
+		await plugin.fileIndex.updateIndexFile(true)
 	}
 
 	const generateReport = async ()=> {
@@ -447,7 +453,8 @@ export const SettingsForm = (props: FormProps) => {
 				<div className="technerium-vshp-settings-setting-control">
 					<input type="text" spellCheck="false" placeholder="path to file a csv file"
 						   value={fileIndexPath}
-						   onChange={(e) => setFileIndexPath(e.target.value)}/>
+						   onChange={(e) => setFileIndexPath(e.target.value)}
+						   onBlur={(e) => handleNewIndexFileName()}/>
 				</div>
 			</div>
 			<div className="technerium-vshp-settings-setting">
@@ -463,7 +470,12 @@ export const SettingsForm = (props: FormProps) => {
 					<Stack direction="row" spacing={2} alignItems="center">
 						<Slider
 							value={fileIndexRefreshInterval}
-							onChange={(_, newValue) => setFileIndexRefreshInterval(newValue as number)}
+							onChange={(_, newValue) => {
+								setFileIndexRefreshInterval(newValue as number)
+							}}
+							onChangeCommitted={(_, newValue) => {
+								saveFileIndexRefreshInterval()
+							}}
 							min={30}
 							max={3600}
 							step={30}
@@ -472,6 +484,7 @@ export const SettingsForm = (props: FormProps) => {
 							type="number"
 							value={fileIndexRefreshInterval}
 							onChange={(event) => setFileIndexRefreshInterval(parseInt(event.target.value))}
+							onBlur={(event) => saveFileIndexRefreshInterval()}
 							size="small"
 							style={{ width: 60 }}
 						/>

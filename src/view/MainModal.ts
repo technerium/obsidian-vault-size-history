@@ -266,7 +266,7 @@ export class GraphModal extends Modal {
 				let fileCDate = new Date(file.stat.ctime)
 				// console.log(`2. file date ${fileCDate} vs ${fileDataIndex[file.path]}`)
 				if(fileDataIndex[file.path]){
-					fileCDate = fileDataIndex[file.path].creationDate
+					fileCDate = fileDataIndex[file.path].computedDate
 				}
 
 				try {
@@ -301,7 +301,7 @@ export class GraphModal extends Modal {
 			const deletedFilePaths = Object.keys(fileDataIndex).filter(filePath =>
 				fileDataIndex[filePath].deletionDate != null
 			)
-			console.log('Accounting for deleted files', deletedFilePaths)
+			// console.log('Accounting for deleted files', deletedFilePaths)
 			for(const filePath of deletedFilePaths){
 				let matchingCategories: FileCategory[] = []
 				let matchFound = false
@@ -326,7 +326,7 @@ export class GraphModal extends Modal {
 				}
 
 				if(matchingCategories){
-					const fileCDate = fileDataIndex[filePath].creationDate
+					const fileCDate = fileDataIndex[filePath].computedDate
 					const fileDDate = fileDataIndex[filePath].deletionDate
 
 

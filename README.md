@@ -233,6 +233,15 @@ If you want to use the index and manually set creation dates for some of the fil
 > User set file creation date as 2020-11-01 and set `Protect Date` to `FALSE`. Current system file creation date is 2023-11-20.
 > Since actual file creation date is later than the one in the CSV file, the plugin will keep the date provided by the user in the CSV file (2020-11-01).
 
+
+> Use case 3:
+>
+> A file is created outside of the Vault on 01/01/2010.
+> The file is added to the Vault on 06/06/2026.
+> File index is enabled, so the plugin will use the date when the file was added to the Vault.
+>
+
+
 ## Troubleshooting
 ![settings_troubleshooting_1.png](docs/settings_troubleshooting_1.png)
 ### Rebuild index

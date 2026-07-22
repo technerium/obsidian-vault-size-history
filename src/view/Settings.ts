@@ -28,6 +28,7 @@ export interface VaultSizeHistoryPluginSettings {
 	legendOrder: LegendOrder
 	categories: FileCategory[]
 	startDateBasedOn: number
+	fileIndexStartedOn: string
 }
 
 export const DEFAULT_SETTINGS: VaultSizeHistoryPluginSettings = {
@@ -62,7 +63,8 @@ export const DEFAULT_SETTINGS: VaultSizeHistoryPluginSettings = {
 			alwaysApply: false
 		}
 	],
-	startDateBasedOn: -1
+	startDateBasedOn: -1,
+	fileIndexStartedOn: ''
 }
 
 export class MainSettingTab extends PluginSettingTab {
